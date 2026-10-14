@@ -216,3 +216,84 @@
     top: 6px;
   }
 }
+
+/* ---------- App-skifteren (Kewins valg, 14. oktober 2026) ----------
+ * sommer-apps.js (kopi fra hub'ens design/ med apps'ene fra summer-frontpage/apps.json) gør mærket i bjælken til en knap,
+ * der folder <nav class="sh-apps"> ud lige under det: forsiden og alle apps som små app-mærker med navn. Uden scriptet
+ * (fx det offentlige Skrald) ændres intet. Forsiden bruger samme gitter øverst på telefonen. Farven følger --sh-*, ikke
+ * --muted/--accent, fordi økonomi-appens shadcn-tokens bruger de navne til HSL-tal.
+ */
+:root[data-design="sommerhimmel"][data-apps] .sh-bar .sh-brand {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+:root[data-design="sommerhimmel"][data-apps] .sh-bar .sh-brand::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin: -4px 4px 0 -4px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  opacity: 0.45;
+  transform: rotate(45deg);
+  transition: transform 0.15s;
+}
+:root[data-design="sommerhimmel"][data-apps] .sh-bar .sh-brand[aria-expanded="true"]::after {
+  transform: translateY(4px) rotate(225deg);
+}
+:root[data-design="sommerhimmel"] .sh-apps {
+  flex-basis: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 4px;
+  padding: 8px 0 2px;
+  border-top: 1px solid var(--sh-line);
+}
+:root[data-design="sommerhimmel"] .sh-apps a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+:root[data-design="sommerhimmel"] .sh-apps a:hover {
+  background: var(--ctl-bg);
+  color: var(--ink);
+}
+:root[data-design="sommerhimmel"] .sh-apps a[aria-current="page"] {
+  background: color-mix(in oklab, var(--sh-active) 12%, transparent);
+  color: var(--ink);
+  font-weight: 700;
+}
+:root[data-design="sommerhimmel"] .sh-apps .app-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  font-size: 20px;
+}
+/* Forsidens mærke: hvid sol på orange forløb, som på forsiden og dens hjemmeskærmsikon. */
+:root[data-design="sommerhimmel"] .sh-apps .app-mark.home {
+  background: linear-gradient(150deg, #ffcf5a, #f59a3a 55%, #e8603c);
+  box-shadow: 0 8px 16px -8px rgba(232, 96, 60, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+/* Meeple (Brætspil) findes ikke i Font Awesome; samme tegning som meeple.svg i Brætspil og på forsiden. */
+:root[data-design="sommerhimmel"] .sh-apps i.fa-meeple {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.25em;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='8.5 8 47 48.5'%3E%3Ccircle cx='32' cy='15.7' r='7.6'/%3E%3Cpath d='M27.5 22.7C20 23.7 13 25.7 9.5 28.2c-1.5 1-1.5 3 0 4L21 37.7C19.5 43.2 16.5 49.2 13.5 52.7c-1 1.2-.2 3 1.5 3h12.5c1.2 0 2.2-.7 2.6-1.8L32 48.7l1.9 5.2c.4 1.1 1.4 1.8 2.6 1.8H49c1.7 0 2.5-1.8 1.5-3C47.5 49.2 44.5 43.2 43 37.7L54.5 32.2c1.5-1 1.5-3 0-4C51 25.7 44 23.7 36.5 22.7z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='8.5 8 47 48.5'%3E%3Ccircle cx='32' cy='15.7' r='7.6'/%3E%3Cpath d='M27.5 22.7C20 23.7 13 25.7 9.5 28.2c-1.5 1-1.5 3 0 4L21 37.7C19.5 43.2 16.5 49.2 13.5 52.7c-1 1.2-.2 3 1.5 3h12.5c1.2 0 2.2-.7 2.6-1.8L32 48.7l1.9 5.2c.4 1.1 1.4 1.8 2.6 1.8H49c1.7 0 2.5-1.8 1.5-3C47.5 49.2 44.5 43.2 43 37.7L54.5 32.2c1.5-1 1.5-3 0-4C51 25.7 44 23.7 36.5 22.7z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+:root[data-design="sommerhimmel"] .sh-apps i.fa-meeple::before,
+:root[data-design="sommerhimmel"] .sh-apps i.fa-meeple::after {
+  content: none;
+}
