@@ -1,6 +1,7 @@
 {
   "name": "waste-collection-dates",
   "private": true,
+  "license": "MIT",
   "version": "2.2.0",
   "type": "module",
   "description": "Vestfor tømmedatoer – lokal app",

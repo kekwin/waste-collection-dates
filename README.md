@@ -43,3 +43,8 @@ npm start
 ## Stop appen
 
 Tryk **Ctrl+C** i terminalen.
+
+## Licens
+
+Koden er under [MIT](LICENSE). Font Awesome Free i `public/fontawesome-free/` (ikoner CC BY 4.0, skrifter SIL OFL, kode MIT)
+og skrifterne i `public/fonts/` har deres egne licenser; se filerne i mapperne.

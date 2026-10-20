@@ -18,6 +18,8 @@ Fælles regler for alle apps (principper, skabelon til denne fil, git): [summer-
 - **Repoet er offentligt: aldrig Font Awesome Pro** (Kewins licens gælder kun private repoer), heller ikke som SVG
   eller under et andet navn. Ikonerne er Font Awesome Free (CC BY 4.0) i `public/fontawesome-free/`, kopi fra
   `summer-hub/design/fontawesome-free` (Kewins valg, 10. oktober 2026). Tjek, at et ikon findes i Free, før det bruges.
+- **Licens: MIT**, ejer "Kewin Sommer Pedersen" (valgt 20. oktober 2026). Gælder koden; Font Awesome Free i
+  `public/fontawesome-free/` og skrifterne har deres egne licenser (se README).
 - Forsiden og påmindelserne bruger appens API (`/api/home/dates`, `/api/dates` med ikoner). Ændr ikke formatet
   uden at ændre `summer-frontpage`.
 
