@@ -38,6 +38,10 @@ describe("API", () => {
     expect(await (await fetch(`${start()}/health`)).json()).toEqual({ ok: true });
   });
 
+  it("siger, at den private instans husker adressen selv", async () => {
+    expect(await (await fetch(`${start()}/api/mode`)).json()).toEqual({ public: false });
+  });
+
   it("uden adresse er der intet at vise", async () => {
     const base = start();
     expect((await fetch(`${base}/api/dates`)).status).toBe(400);
@@ -74,8 +78,8 @@ describe("API", () => {
   });
 
   it("hjemmeadressen bruges, når der ikke er gemt en anden, og kan altid hentes for sig", async () => {
-    const base = start("Rendsagervej 130, 2625 Vallensbæk");
-    expect(await (await fetch(`${base}/api/saved-address`)).json()).toEqual({ id: "h1", navn: "Rendsagervej 130, 2625 Vallensbæk" });
+    const base = start("Eksempelvej 130, 2625 Vallensbæk");
+    expect(await (await fetch(`${base}/api/saved-address`)).json()).toEqual({ id: "h1", navn: "Eksempelvej 130, 2625 Vallensbæk" });
     expect(((await (await fetch(`${base}/api/home/dates`)).json()) as unknown[]).length).toBe(2);
     expect(((await (await fetch(`${base}/api/dates`)).json()) as unknown[]).length).toBe(2);
   });

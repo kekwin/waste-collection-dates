@@ -12,14 +12,14 @@ export interface AppOptions {
   dataDir: string;
   /** Den byggede side (dist/). Uden den leverer appen kun API'et. */
   staticDir?: string | undefined;
-  /** HOME_ADDRESS, fx "Rendsagervej 130, 2625 Vallensbæk", præcis som Vestfor skriver den. */
+  /** HOME_ADDRESS, fx "Eksempelvej 130, 2625 Vallensbæk", præcis som Vestfor skriver den. */
   homeAddress?: string;
 }
 
 const errorMessage = (err: unknown) => (err instanceof Error ? err.message : String(err));
 
 /** Tømmedatoer med ikonet pr. affaldstype, så hub'ens forside viser de samme ikoner som appen. */
-const withIcons = (dates: WasteDate[]): WasteDateWithIcon[] => dates.map((ev) => ({ ...ev, icon: wasteType(ev.title).icon }));
+export const withIcons = (dates: WasteDate[]): WasteDateWithIcon[] => dates.map((ev) => ({ ...ev, icon: wasteType(ev.title).icon }));
 
 export const createApp = ({ vestfor, dataDir, staticDir, homeAddress = "" }: AppOptions): Express => {
   const app = express();
@@ -40,6 +40,7 @@ export const createApp = ({ vestfor, dataDir, staticDir, homeAddress = "" }: App
   };
 
   app.get("/health", (_req, res) => void res.json({ ok: true }));
+  app.get("/api/mode", (_req, res) => void res.json({ public: false })); // siderne spørger, om adressen skal følge med i hvert kald
   app.use(express.json());
   if (staticDir) app.use(express.static(staticDir));
   fs.mkdirSync(dataDir, { recursive: true });

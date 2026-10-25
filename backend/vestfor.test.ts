@@ -77,14 +77,14 @@ describe("resolveHome", () => {
       calls++;
       return new Response(
         JSON.stringify([
-          { Id: "9", FuldtVejnavn: "Rendsagervej 1, 2625 Vallensbæk", Postnr: "2625" },
-          { Id: "8", FuldtVejnavn: "Rendsagervej 10, 2625 Vallensbæk" },
+          { Id: "9", FuldtVejnavn: "Eksempelvej 1, 2625 Vallensbæk", Postnr: "2625" },
+          { Id: "8", FuldtVejnavn: "Eksempelvej 10, 2625 Vallensbæk" },
         ]),
       );
     }) as unknown as typeof fetch;
     const vestfor = createVestfor(options(fetchFn));
-    expect(await vestfor.resolveHome("rendsagervej  1, 2625 Vallensbæk")).toEqual({ id: "9", navn: "Rendsagervej 1, 2625 Vallensbæk", postnr: "2625" });
-    await vestfor.resolveHome("rendsagervej 1, 2625 Vallensbæk");
+    expect(await vestfor.resolveHome("eksempelvej  1, 2625 Vallensbæk")).toEqual({ id: "9", navn: "Eksempelvej 1, 2625 Vallensbæk", postnr: "2625" });
+    await vestfor.resolveHome("eksempelvej 1, 2625 Vallensbæk");
     expect(calls).toBe(1);
   });
 

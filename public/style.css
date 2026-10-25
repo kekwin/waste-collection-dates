@@ -461,3 +461,24 @@ h1 {
   background:    color-mix(in oklab, var(--warning) 12%, var(--card-bg));
   font-size:     0.9rem;
 }
+
+/* ── Abonnement og note (offentlig instans) ─────────────────────────────── */
+.hint {
+  font-size:  0.8125rem;
+  color:      var(--text-muted);
+  margin-top: 12px;
+}
+
+.subscribe-card { display: flex; flex-direction: column; gap: 10px; font-size: 0.9375rem; }
+.subscribe-card .hint { margin-top: 0; }
+
+#subscribe-url {
+  width:         100%;
+  font-family:   var(--font);
+  font-size:     0.875rem;
+  padding:       10px 12px;
+  border-radius: var(--radius-sm);
+  border:        1.5px solid var(--grid);
+  background:    var(--surface-2);
+  color:         var(--ink);
+}

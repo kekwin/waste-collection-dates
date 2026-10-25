@@ -66,7 +66,11 @@
           </svg>
           Download kalender (.ics)
         </a>
-        <a href="/print.html" target="_blank" rel="noopener" class="btn btn-secondary">
+        <button id="subscribe-btn" class="btn btn-secondary hidden" type="button" aria-expanded="false" aria-controls="subscribe-card">
+          <i class="ico fad fa-calendar-alt" aria-hidden="true"></i>
+          Abonnér på kalender
+        </button>
+        <a id="print-link" href="/print.html" target="_blank" rel="noopener" class="btn btn-secondary">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                stroke-linecap="round" stroke-linejoin="round"
                width="15" height="15" aria-hidden="true">
@@ -76,6 +80,18 @@
           </svg>
           Udskriv / PDF
         </a>
+    </div>
+
+    <!-- ── Abonnement (kun den offentlige instans) ── -->
+    <div class="card subscribe-card hidden" id="subscribe-card">
+      <p>Kalenderen opdaterer sig selv, men holder op, hvis tjenesten lukkes. Download-knappen giver i stedet et øjebliksbillede for det næste år, som ikke afhænger af tjenesten.</p>
+      <label for="subscribe-url" class="field-label">Adresse til kalenderen</label>
+      <input type="text" id="subscribe-url" readonly />
+      <div class="actions">
+        <button id="copy-btn" class="btn btn-ghost" type="button"><i class="ico fad fa-copy" aria-hidden="true"></i> Kopiér adresse</button>
+        <a id="webcal-link" href="#" class="btn btn-primary"><i class="ico fad fa-calendar-plus" aria-hidden="true"></i> Åbn i kalenderprogram</a>
+      </div>
+      <p class="hint">Google Kalender: Andre kalendere → Fra URL. Outlook: Tilføj kalender → Abonner fra internettet. Apple Kalender: Arkiv → Ny kalenderabonnering.</p>
     </div>
 
     <!-- ── Address search ── -->
@@ -93,7 +109,7 @@
           <input
             type="text"
             id="search-input"
-            placeholder="Søg vejnavn, fx Rendsagervej 12…"
+            placeholder="Søg vejnavn, fx Eksempelvej 12…"
             autocomplete="off"
             spellcheck="false"
             aria-label="Søg adresse"
@@ -103,6 +119,7 @@
           <div id="autocomplete" class="autocomplete hidden" role="listbox"></div>
         </div>
       </div>
+      <p class="hint hidden" id="public-note">Din adresse gemmes kun i din egen browser. Tjenesten viser datoer fra Vestfor og gemmer ingen adresser.</p>
     </section>
 
     <!-- ── Loading ── -->

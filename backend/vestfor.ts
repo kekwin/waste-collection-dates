@@ -2,6 +2,7 @@ import type { SavedAddress, VestforAddress, WasteDate } from "../shared/types.ts
 
 export const VESTFOR_BASE = "https://selvbetjening.vestfor.dk";
 const FETCH_TIMEOUT_MS = 10000;
+const MAX_SESSIONS = 500;
 const USER_AGENT = "Mozilla/5.0 (compatible; Skraldetomning/1.0)";
 
 type Cookies = Record<string, string>;
@@ -80,7 +81,13 @@ export const createVestfor = ({ fetchFn = fetch, base = VESTFOR_BASE, timeoutMs 
   /** Visit MinSide for the given address in a fresh session and remember its cookies. */
   const establishSession = async (addressId: string): Promise<Cookies> => {
     const cookies = await fetchFollowingRedirects(`${base}/Home/MinSide?address-selected-id=${encodeURIComponent(addressId)}`);
+    sessions.delete(addressId);
     sessions.set(addressId, cookies);
+    // Loft, så en offentlig instans ikke samler sessioner for evigt (de ældste smides ud og oprettes igen ved behov).
+    for (const oldest of sessions.keys()) {
+      if (sessions.size <= MAX_SESSIONS) break;
+      sessions.delete(oldest);
+    }
     return cookies;
   };
 

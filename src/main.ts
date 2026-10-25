@@ -66,11 +66,53 @@ const changeAddressBtn = $("change-address-btn");
 const homeBanner = $("home-banner");
 const homeBtn = $("home-btn");
 const homeName = $("home-name");
+const icsLink = $<HTMLAnchorElement>("ics-link");
+const printLink = $<HTMLAnchorElement>("print-link");
+const subscribeBtn = $("subscribe-btn");
+const subscribeCard = $("subscribe-card");
+const subscribeUrl = $<HTMLInputElement>("subscribe-url");
+const webcalLink = $<HTMLAnchorElement>("webcal-link");
+const copyBtn = $("copy-btn");
+const publicNote = $("public-note");
 
 // ── App state ─────────────────────────────────────────────────────────────────
 let currentAddress: SavedAddress | null = null;
 let homeAddress: SavedAddress | null = null; // HOME_ADDRESS fra hub'ens .env (null, hvis den ikke er sat)
 let searchTimer: ReturnType<typeof setTimeout> | undefined;
+// Den offentlige instans gemmer ingenting på serveren: adressen bor i browseren og følger med i hvert kald.
+let stateless = false;
+const STORAGE_KEY = "skraldehentning.adresse";
+
+const loadStoredAddress = (): SavedAddress | null => {
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null") as SavedAddress | null;
+    return stored && typeof stored.id === "string" && stored.id ? stored : null;
+  } catch {
+    return null;
+  }
+};
+
+const storeAddress = (address: SavedAddress) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(address));
+  } catch {
+    // Privat tilstand eller blokeret lager: adressen huskes bare ikke til næste gang.
+  }
+};
+
+/** Adresse-id'et som query, når serveren ikke husker adressen selv. */
+const idQuery = (address: SavedAddress) => `?id=${encodeURIComponent(address.id)}`;
+
+/** Kalenderfilen, abonnementet og udskriftssiden peger på den viste adresse. */
+const updateLinks = () => {
+  if (!stateless || !currentAddress) return;
+  const q = idQuery(currentAddress);
+  icsLink.href = `/api/calendar.ics${q}`;
+  printLink.href = `/print.html${q}&navn=${encodeURIComponent(currentAddress.navn ?? "")}&postnr=${encodeURIComponent(currentAddress.postnr ?? "")}`;
+  const url = new URL(`/api/calendar.ics${q}`, location.href);
+  subscribeUrl.value = url.href;
+  webcalLink.href = url.href.replace(/^https?:/, "webcal:");
+};
 
 const messageOf = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
@@ -87,6 +129,7 @@ const showSearchView = () => {
 
 const showDatesView = () => {
   if (currentAddress) {
+    updateLinks();
     const postnr = currentAddress.postnr ? `, ${currentAddress.postnr}` : "";
     const atHome = !!homeAddress && currentAddress.id === homeAddress.id;
     const pin = document.createElement("i");
@@ -114,7 +157,7 @@ const loadDates = async () => {
   datesList.innerHTML = "";
 
   try {
-    const r = await fetch("/api/dates");
+    const r = await fetch(stateless && currentAddress ? `/api/dates${idQuery(currentAddress)}` : "/api/dates");
     if (!r.ok) {
       const err = (await r.json().catch(() => ({ error: `HTTP ${r.status}` }))) as { error?: string };
       throw new Error(err.error || `HTTP ${r.status}`);
@@ -189,14 +232,18 @@ const selectAddress = async ({ id, navn, postnr }: SavedAddress) => {
   errorCard.classList.add("hidden");
 
   try {
-    const r = await fetch("/api/set-address", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, navn, postnr }),
-    });
-    if (!r.ok) {
-      const err = (await r.json().catch(() => ({}))) as { error?: string };
-      throw new Error(err.error || "Kunne ikke sætte adresse");
+    if (stateless) {
+      storeAddress({ id, navn, postnr });
+    } else {
+      const r = await fetch("/api/set-address", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, navn, postnr }),
+      });
+      if (!r.ok) {
+        const err = (await r.json().catch(() => ({}))) as { error?: string };
+        throw new Error(err.error || "Kunne ikke sætte adresse");
+      }
     }
     currentAddress = { id, navn, postnr };
     showDatesView();
@@ -244,6 +291,13 @@ const renderAutocomplete = (results: VestforAddress[]) => {
 const doSearch = async (term: string) => {
   try {
     const r = await fetch(`/api/search?term=${encodeURIComponent(term)}`);
+    if (!r.ok) {
+      autocompleteEl.classList.add("hidden");
+      const err = (await r.json().catch(() => ({}))) as { error?: string };
+      showError(err.error || `HTTP ${r.status}`);
+      return;
+    }
+    errorCard.classList.add("hidden");
     renderAutocomplete((await r.json()) as VestforAddress[]);
   } catch {
     autocompleteEl.classList.add("hidden");
@@ -275,6 +329,15 @@ homeBtn.addEventListener("click", () => {
   if (homeAddress) void selectAddress(homeAddress);
 });
 
+subscribeBtn.addEventListener("click", () => {
+  const open = subscribeCard.classList.toggle("hidden") === false;
+  subscribeBtn.setAttribute("aria-expanded", String(open));
+});
+copyBtn.addEventListener("click", () => {
+  subscribeUrl.select();
+  void navigator.clipboard?.writeText(subscribeUrl.value).catch(() => document.execCommand("copy"));
+});
+
 retryBtn.addEventListener("click", () => {
   errorCard.classList.add("hidden");
   if (currentAddress) {
@@ -287,6 +350,23 @@ retryBtn.addEventListener("click", () => {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 const init = async () => {
+  stateless = await fetch("/api/mode")
+    .then((r) => (r.ok ? (r.json() as Promise<{ public?: boolean }>) : null))
+    .then((m) => m?.public === true)
+    .catch(() => false);
+  if (stateless) {
+    subscribeBtn.classList.remove("hidden");
+    publicNote.classList.remove("hidden");
+    const stored = loadStoredAddress();
+    if (stored) {
+      currentAddress = stored;
+      showDatesView();
+      void loadDates();
+    } else {
+      showSearchView();
+    }
+    return;
+  }
   homeAddress = await fetch("/api/home")
     .then((r) => (r.ok ? (r.json() as Promise<SavedAddress | null>) : null))
     .catch(() => null);

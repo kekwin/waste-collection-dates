@@ -32,10 +32,15 @@ const el = (tag: string, className: string): HTMLElement => {
 
 const render = async () => {
   try {
-    const [datesRes, addrRes] = await Promise.all([fetch("/api/dates"), fetch("/api/saved-address")]);
+    // Den offentlige instans husker ingen adresse: siden åbnes med ?id=…&navn=…&postnr=… fra hovedsiden.
+    const params = new URLSearchParams(location.search);
+    const id = params.get("id");
+    const [datesRes, addrRes] = id
+      ? [await fetch(`/api/dates?id=${encodeURIComponent(id)}`), null]
+      : await Promise.all([fetch("/api/dates"), fetch("/api/saved-address")]);
 
     const dates = (await datesRes.json()) as WasteDateWithIcon[] | { error?: string };
-    const address = (await addrRes.json()) as SavedAddress | null;
+    const address = addrRes ? ((await addrRes.json()) as SavedAddress | null) : { id: id ?? "", navn: params.get("navn") ?? "", postnr: params.get("postnr") ?? "" };
 
     if (!Array.isArray(dates)) {
       throw new Error(dates.error || "Uventet svar fra serveren");
@@ -121,12 +126,14 @@ const render = async () => {
     }
 
     /* ── Show + auto-print ───────────────────────────────────────────────── */
-    $("loading-msg").style.display = "none";
-    $("content").style.display = "block";
+    $("loading-msg").classList.add("hidden");
+    $("content").classList.remove("hidden");
     setTimeout(() => window.print(), 500);
   } catch (err) {
     txt($("loading-msg"), "Fejl: " + (err instanceof Error ? err.message : String(err)));
   }
 };
+
+$("print-btn").addEventListener("click", () => window.print());
 
 void render();
