@@ -61,13 +61,13 @@ npm run dev            # genbygger siderne ved ændringer
 ## Status
 
 v2.3.0 (25. oktober 2026) har `PUBLIC_MODE` (se Regler) og abonnement på kalenderen i den offentlige udgave; den private instans er uændret. **Funnel er endnu ikke åbnet**
-(hub-delen og Kewins klik i Tailscale mangler, se Næste skridt). Samme dag fjernet et vejnavn og husnummer fra README, tests og kommentarer (stod i
+(Kewins klik i Tailscale mangler, se Næste skridt). Samme dag fjernet et vejnavn og husnummer fra README, tests og kommentarer (stod i
 historikken fra før). Før v2.3.0: v2.2.0 kører i hub'en (10. oktober 2026: Font Awesome Free-ikoner i stedet for emojis på siderne (affaldstyper, adresse, fejl, udskrift), nyt favicon og hjemmeskærmsikon; samme dag: Sommerhimmel i lys version, det fælles udseende fra `summer-hub/design/sommer-ui.css`: glaskort, toppen som glasbjælke, runde knapper; 8. oktober 2026: `/health`; 7. oktober 2026: omskrevet til TypeScript `strict` med Express 5 og indbygget `fetch`, uændret funktion og uændret API) på http://127.0.0.1:3000 og https://waste-collection-dates.tailcc94cc.ts.net.
 Henter datoer igen med ny session, når Vestfor svarer med en tom liste (v1.4.2).
 
 ## Næste skridt
 
-1. **POC: åbn appen for naboer via Tailscale Funnel** (Kewins ønske, 25. oktober 2026). Appens del er bygget (v2.3.0). Mangler: den offentlige
-   tjeneste i hub'en (`waste-collection-dates-public`, maskinen `skraldehentning`, ingen volumen, `PUBLIC_MODE=1`, `TRUST_PROXY=1`) og
-   `AllowFunnel`; **Kewin:** tillad Funnel i Tailscales politik og på maskinen; test udefra (telefon på mobildata) og find ud af, hvilken header
-   der giver klientens IP gennem Funnel. Plan og prompt: `summer-hub/docs/ROADMAP.md` ("Spor: Tailscale Funnel") og `summer-hub/docs/PROMPT-skrald-funnel.md`.
+1. **POC: åbn appen for naboer via Tailscale Funnel** (Kewins ønske, 25. oktober 2026). Appen (v2.3.0) og hub'ens offentlige tjeneste
+   (`waste-collection-dates-public`, maskinen `skraldehentning`, kun tailnet) kører. Mangler: **Kewin** giver sit ja og tillader Funnel i Tailscale
+   (trin i `summer-hub/docs/RUNBOOK.md`, afsnittet Tailscale); så slås `AllowFunnel` til, og der testes udefra (telefon på mobildata), herunder at
+   Funnel giver klientens IP i `X-Forwarded-For` (ellers deler alle én grænse). Plan: `summer-hub/docs/ROADMAP.md` ("Spor: Tailscale Funnel").
