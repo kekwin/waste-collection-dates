@@ -74,6 +74,7 @@ const subscribeUrl = $<HTMLInputElement>("subscribe-url");
 const webcalLink = $<HTMLAnchorElement>("webcal-link");
 const copyBtn = $("copy-btn");
 const publicNote = $("public-note");
+const publicLinkNote = $("public-link-note");
 
 // ── App state ─────────────────────────────────────────────────────────────────
 let currentAddress: SavedAddress | null = null;
@@ -367,6 +368,7 @@ const init = async () => {
     }
     return;
   }
+  publicLinkNote.classList.remove("hidden");
   homeAddress = await fetch("/api/home")
     .then((r) => (r.ok ? (r.json() as Promise<SavedAddress | null>) : null))
     .catch(() => null);
