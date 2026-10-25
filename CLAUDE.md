@@ -57,4 +57,6 @@ Henter datoer igen med ny session, når Vestfor svarer med en tom liste (v1.4.2)
 
 ## Næste skridt
 
-Ingen planlagte.
+1. **POC: åbn appen for naboer via Tailscale Funnel** (Kewins ønske, 25. oktober 2026). Husets adresse og de private ruter må ikke kunne nås
+   derfra, så det bliver en egen offentlig instans med forsøgsgrænse. Plan og prompt: `summer-hub/docs/ROADMAP.md` ("Spor: Tailscale Funnel")
+   og `summer-hub/docs/PROMPT-skrald-funnel.md`.
