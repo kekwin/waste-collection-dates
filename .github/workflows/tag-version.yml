@@ -1,31 +1,59 @@
 # KOPI af summer-hub/workflows/tag-version.yml – ret den i hub'en og kør `node scripts/sync-shared.mjs` dér.
-# Opretter versionstagget (v<version> fra package.json), når en ny version pushes til main.
-# Hvorfor: Claude-sessioner i skyen kan pushe til main, men proxyen afviser tag-push (HTTP 403).
-# Hub'en bygger fra tags, så GitHub opretter dem selv. Regler: summer-hub/docs/ARKITEKTUR.md, "Versionstags".
+# Opretter versionstagget (v<version> fra package.json), når en ny version er pushet til main, og KUN når `npm run check`
+# er grøn på den commit. Hub'en udruller nye tags af sig selv kl. 7 og 16 (scripts/opdater.sh), så tagget er porten til drift.
+# Hvorfor: Claude-sessioner i skyen kan pushe til main, men proxyen afviser tag-push (HTTP 403), så GitHub opretter tagget.
+# Testkravet kom 30. oktober 2026: før blev alt, der blev pushet med en ny version, udrullet, også med røde tests.
+# Regler: summer-hub/docs/ARKITEKTUR.md, "Versionstags".
+#
+# Kører ved hvert push til main: findes tagget for versionen allerede, sker der intet. Ellers køres testene, og tagget
+# oprettes, hvis de er grønne. Fejler de, kommer versionen ikke i drift; et senere push med rettelsen tagger den så selv
+# (ingen ny version nødvendig). GitHub sender en mail, når en kørsel fejler.
 name: Tag version
 
 on:
   push:
     branches: [main]
-    paths: [package.json]
   workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: tag-version
+  cancel-in-progress: false
 
 jobs:
   tag:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Opret versionstag, hvis det ikke findes
+      - name: Findes tagget allerede?
+        id: version
         run: |
           version=$(node -p "require('./package.json').version")
           tag="v${version}"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
           if git ls-remote --exit-code --tags origin "refs/tags/${tag}" > /dev/null; then
             echo "${tag} findes allerede, intet at gøre."
-            exit 0
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
+      - uses: actions/setup-node@v4
+        if: steps.version.outputs.exists == 'false'
+        with:
+          node-version: 24
+          cache: npm
+      - name: Installér
+        if: steps.version.outputs.exists == 'false'
+        run: npm ci --no-audit --no-fund
+      - name: Typecheck, lint og tests (npm run check)
+        if: steps.version.outputs.exists == 'false'
+        run: npm run check
+      - name: Opret versionstag
+        if: steps.version.outputs.exists == 'false'
+        run: |
+          tag="${{ steps.version.outputs.tag }}"
           git tag "${tag}" "${GITHUB_SHA}"
           git push origin "${tag}"
-          echo "Oprettede ${tag} på ${GITHUB_SHA}."
+          echo "Testene er grønne. Oprettede ${tag} på ${GITHUB_SHA}."
