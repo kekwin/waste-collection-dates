@@ -314,3 +314,11 @@
   box-shadow: 0 8px 16px -8px rgba(19, 115, 154, 0.8);
 }
 :root[data-design="sommerhimmel"] .app-mark > i.fa-wow { width: 100%; height: 100%; vertical-align: top; border-radius: inherit; }
+/* Forsiden: kortets og opgavens farvede flade vises ikke bag WoW-logoet; logoet er selv fladen. */
+:root[data-design="sommerhimmel"] .mini-ico:has(> i.fa-wow),
+:root[data-design="sommerhimmel"] .task-ico:has(> i.fa-wow) {
+  background: none;
+  box-shadow: 0 8px 18px -8px rgba(19, 115, 154, 0.8);
+}
+:root[data-design="sommerhimmel"] .mini-ico > i.fa-wow,
+:root[data-design="sommerhimmel"] .task-ico > i.fa-wow { width: 100%; height: 100%; vertical-align: top; border-radius: inherit; }
