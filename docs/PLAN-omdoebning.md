@@ -1,5 +1,7 @@
 # Plan: nyt navn til `skralde-toemnings-app`
 
+**Status: udført 6. oktober 2026** (repoet hedder `waste-collection-dates`). Teksten nedenfor er den oprindelige plan, og "Åbne valg" er afgjort.
+
 Skrevet 5. oktober 2026. Del af "engelske navne på alle apps"; start med at læse opskriften og faldgruberne i
 `familien-sommer-hub/docs/PLAN-engelske-navne.md`. Første omdøbning, `enyaq-app` → `home-energy`, er udført og
 beskrevet i `home-energy/docs/PLAN-omdoebning.md`.
