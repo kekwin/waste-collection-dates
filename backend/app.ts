@@ -6,6 +6,7 @@ import { wasteType } from "../shared/waste-types.ts";
 import { buildIcs, eventsFromDates } from "./ics.ts";
 import type { Vestfor } from "./vestfor.ts";
 import { crossSiteGuard, parseAllowedOrigins } from "../shared/contracts/cross-site-guard.ts";
+import type { WasteAddress, WasteDatesResponse } from "../shared/contracts/waste-dates.ts";
 
 export interface AppOptions {
   vestfor: Vestfor;
@@ -51,13 +52,13 @@ export const createApp = ({ vestfor, dataDir, staticDir, homeAddress = "" }: App
 
   // GET /api/saved-address
   app.get("/api/saved-address", async (_req, res) => {
-    res.json(readSaved() ?? (await resolveHome().catch(() => null)));
+    res.json((readSaved() ?? (await resolveHome().catch(() => null))) satisfies WasteAddress | null);
   });
 
   // GET /api/home – hjemmeadressen fra HOME_ADDRESS (null, hvis den ikke er sat)
   app.get("/api/home", async (_req, res) => {
     try {
-      res.json(await resolveHome());
+      res.json((await resolveHome()) satisfies WasteAddress | null);
     } catch (err) {
       res.status(500).json({ error: errorMessage(err) });
     }
@@ -68,7 +69,7 @@ export const createApp = ({ vestfor, dataDir, staticDir, homeAddress = "" }: App
     try {
       const h = await resolveHome();
       if (!h) return void res.status(404).json({ error: "HOME_ADDRESS er ikke sat" });
-      res.json(withIcons(await vestfor.fetchTommeDates(h.id)));
+      res.json(withIcons(await vestfor.fetchTommeDates(h.id)) satisfies WasteDatesResponse);
     } catch (err) {
       res.status(500).json({ error: errorMessage(err) });
     }
@@ -106,7 +107,7 @@ export const createApp = ({ vestfor, dataDir, staticDir, homeAddress = "" }: App
     if (!currentAddressId) return void res.status(400).json({ error: "Ingen adresse valgt" });
 
     try {
-      res.json(withIcons(await vestfor.fetchTommeDates(currentAddressId)));
+      res.json(withIcons(await vestfor.fetchTommeDates(currentAddressId)) satisfies WasteDatesResponse);
     } catch (err) {
       res.status(500).json({ error: errorMessage(err) });
     }
