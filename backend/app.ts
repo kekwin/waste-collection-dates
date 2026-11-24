@@ -5,6 +5,7 @@ import type { SavedAddress, WasteDate, WasteDateWithIcon } from "../shared/types
 import { wasteType } from "../shared/waste-types.ts";
 import { buildIcs, eventsFromDates } from "./ics.ts";
 import type { Vestfor } from "./vestfor.ts";
+import { crossSiteGuard, parseAllowedOrigins } from "../shared/contracts/cross-site-guard.ts";
 
 export interface AppOptions {
   vestfor: Vestfor;
@@ -23,6 +24,9 @@ export const withIcons = (dates: WasteDate[]): WasteDateWithIcon[] => dates.map(
 
 export const createApp = ({ vestfor, dataDir, staticDir, homeAddress = "" }: AppOptions): Express => {
   const app = express();
+  // Værn mod kald fra fremmede hjemmesider (CSRF, summer-hub/contracts/cross-site-guard.ts): ændrende kald, som browseren siger kommer fra
+  // en anden side, afvises med 403. Kald uden Origin (andre apps, MCP, iOS-genveje, scripts) går igennem.
+  app.use(crossSiteGuard({ allowedOrigins: parseAllowedOrigins(process.env.ALLOWED_ORIGINS) }));
   const savedAddressFile = path.join(dataDir, "saved-address.json");
   const readSaved = (): SavedAddress | null =>
     fs.existsSync(savedAddressFile) ? (JSON.parse(fs.readFileSync(savedAddressFile, "utf8")) as SavedAddress) : null;

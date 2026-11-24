@@ -90,3 +90,13 @@ describe("API", () => {
     expect(((await (await fetch(`${base}/api/search?term=test`)).json()) as unknown[]).length).toBe(1);
   });
 });
+
+describe("værn mod kald fra fremmede hjemmesider", () => {
+  it("afviser ændrende kald fra en anden side, men ikke GET eller kald uden Origin", async () => {
+    const base = start();
+    const evil = { "Sec-Fetch-Site": "cross-site", Origin: "https://ond.example", "Content-Type": "application/json" };
+    expect((await fetch(`${base}/api/findes-ikke`, { method: "POST", headers: evil, body: "{}" })).status).toBe(403);
+    expect((await fetch(`${base}/api/findes-ikke`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" })).status).not.toBe(403);
+    expect((await fetch(`${base}/health`, { headers: evil })).status).toBe(200);
+  });
+});

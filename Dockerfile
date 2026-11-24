@@ -10,6 +10,9 @@ COPY . .
 RUN npm run build
 
 FROM node:24-bookworm-slim
+# npm, npx, corepack og yarn køres aldrig i drift, men deres pakker gav de fleste fund i sikkerhedsscannet (summer-hub/docs/team/EMNER.md).
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+    /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack /usr/local/bin/yarn /usr/local/bin/yarnpkg
 WORKDIR /app
 ENV NODE_ENV=production \
     PORT=3000 \

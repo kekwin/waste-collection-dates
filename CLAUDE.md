@@ -60,6 +60,8 @@ npm run dev            # genbygger siderne ved ændringer
 
 ## Status
 
+**v2.3.6 (24. november 2026): værn mod kald fra fremmede hjemmesider og npm ud af imaget** (hub'ens idé 1 og 3). Ændrende kald, som browseren siger kommer fra en anden side, afvises med 403 (`crossSiteGuard`, kopi af hub'ens `contracts/cross-site-guard.ts`; `ALLOWED_ORIGINS` kan tillade andre sider). Kun den private udgave; den offentlige har kun GET. npm, npx, corepack og yarn er fjernet fra det færdige image.
+
 v2.3.0 (25. oktober 2026) har `PUBLIC_MODE` (se Regler) og abonnement på kalenderen i den offentlige udgave; den private instans er uændret. **Funnel er åbnet 25. oktober 2026**
 (maskinen `skraldehentning`; Kewin: "virker fint"). Samme dag fjernet et vejnavn og husnummer fra README, tests og kommentarer (stod i
 historikken fra før). Før v2.3.0: v2.2.0 kører i hub'en (10. oktober 2026: Font Awesome Free-ikoner i stedet for emojis på siderne (affaldstyper, adresse, fejl, udskrift), nyt favicon og hjemmeskærmsikon; samme dag: Sommerhimmel i lys version, det fælles udseende fra `summer-hub/design/sommer-ui.css`: glaskort, toppen som glasbjælke, runde knapper; 8. oktober 2026: `/health`; 7. oktober 2026: omskrevet til TypeScript `strict` med Express 5 og indbygget `fetch`, uændret funktion og uændret API) på http://127.0.0.1:3000 og https://waste-collection-dates.tailcc94cc.ts.net.
