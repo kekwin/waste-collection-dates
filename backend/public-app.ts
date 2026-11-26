@@ -1,9 +1,10 @@
-import express, { type Express, type NextFunction, type Request, type Response } from "express";
+import express, { type Express, type Request, type Response } from "express";
 import type { VestforAddress, WasteDate } from "../shared/types.ts";
 import { withIcons } from "./app.ts";
 import { buildIcs, eventsFromDates } from "./ics.ts";
 import { createCache, createRateLimiter } from "./limits.ts";
 import type { Vestfor } from "./vestfor.ts";
+import { installSecurityHeaders } from "./security-headers.ts";
 
 /**
  * Den offentlige instans (PUBLIC_MODE), der står på Tailscale Funnel. Den er bevidst en separat app:
@@ -68,22 +69,11 @@ const CSP = [
   "frame-ancestors 'none'",
 ].join("; ");
 
-const securityHeaders = (_req: Request, res: Response, next: NextFunction) => {
-  res.setHeader("Content-Security-Policy", CSP);
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("X-Frame-Options", "DENY");
-  res.setHeader("Referrer-Policy", "no-referrer");
-  res.setHeader("Permissions-Policy", "geolocation=(), camera=(), microphone=(), payment=()");
-  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-  next();
-};
-
 export const createPublicApp = ({ vestfor, staticDir, trustProxy = 0, now = Date.now, limits = {} }: PublicAppOptions): Express => {
   const cfg = { ...DEFAULT_LIMITS, ...limits };
   const app = express();
-  app.disable("x-powered-by");
+  installSecurityHeaders(app, { csp: CSP });
   app.set("trust proxy", trustProxy);
-  app.use(securityHeaders);
 
   const searchLimiter = createRateLimiter({ limit: cfg.searchPerIp, windowMs: MINUTE_MS, now });
   const datesLimiter = createRateLimiter({ limit: cfg.datesPerIp, windowMs: MINUTE_MS, now });

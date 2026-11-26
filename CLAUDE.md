@@ -60,6 +60,9 @@ npm run dev            # genbygger siderne ved ændringer
 
 ## Status
 
+**v2.3.7 (26. november 2026): HSTS og `Cross-Origin-Resource-Policy` på den offentlige udgave** (hub'ens idé 82). Sikkerhedshovederne kommer nu fra
+`backend/security-headers.ts`, en kopi af hub'ens `common/security-headers.ts`; appens egen CSP er uændret.
+
 **v2.3.6 (24. november 2026): værn mod kald fra fremmede hjemmesider og npm ud af imaget** (hub'ens idé 1 og 3). Ændrende kald, som browseren siger kommer fra en anden side, afvises med 403 (`crossSiteGuard`, kopi af hub'ens `contracts/cross-site-guard.ts`; `ALLOWED_ORIGINS` kan tillade andre sider). Kun den private udgave; den offentlige har kun GET. npm, npx, corepack og yarn er fjernet fra det færdige image.
 
 v2.3.0 (25. oktober 2026) har `PUBLIC_MODE` (se Regler) og abonnement på kalenderen i den offentlige udgave; den private instans er uændret. **Funnel er åbnet 25. oktober 2026**
